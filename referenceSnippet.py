@@ -11,7 +11,7 @@ class ReferenceSnippet() :
         self.name = name
 
     def learn_from_wave_file(self, file_path) :
-        print "Learning"
+        print "Learning for "+ self.name
         wf = wave.open(file_path, 'rb')
         dictionaries = []
         p = pyaudio.PyAudio()
@@ -24,7 +24,7 @@ class ReferenceSnippet() :
         data = wf.readframes(var.CHUNK)
 
         while data != '':
-            dictionaries.append(da.getFft(data, var.RATE))
+            dictionaries.append(da.normalize(da.getFft(data, var.RATE)))
             data = wf.readframes(var.CHUNK)
 
             stream.stop_stream()
@@ -35,31 +35,31 @@ class ReferenceSnippet() :
         mean_dictionnary = da.average_dictionary(dictionaries)
         print "Done Learning" 
         
-        threshold = 0
-        count = 0
-        wf = wave.open(file_path, 'rb')
+        threshold = 0 ;
+        for fft_data in dictionaries :
+            threshold += da.distance(fft_data, mean_dictionnary)
 
-        stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
-            channels=wf.getnchannels(),
-            rate=wf.getframerate(),
-            output=True)
-
-        data = wf.readframes(var.CHUNK)
-
-        while data != '':
-            count += 1
-            data_fft = da.normalize(da.getFft(data, wf.getframerate()))
-            threshold += da.distance(data_fft, mean_dictionnary)
-            data = wf.readframes(var.CHUNK)
-
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
-
-        threshold /= count
+        threshold /= len(dictionaries)
 
         print "Done setting the threshold at " + str(threshold)
-        self.chord_fft = mean_dictionnary
+
+        real_list = []
+        for fft_data in dictionaries :
+            if da.distance(fft_data, mean_dictionnary) < threshold :
+                real_list.append(fft_data)
+
+        new_mean = da.average_dictionary(real_list)
+        print "Done filtering"
+        print "Distance between the new and old means is " + str(da.distance(mean_dictionnary, new_mean))
+
+        threshold = 0 ;
+        for fft_data in real_list :
+            threshold += da.distance(fft_data, new_mean)
+
+        threshold /= len(real_list)
+        print "Done resetting the threshold at " + str(threshold)
+        print len(real_list)
+        self.chord_fft = new_mean
         self.threshold = threshold
 
     def save_to_file(self, f):

@@ -9,8 +9,8 @@ FORMAT = pyaudio.paInt16
 CHANNELS = var.CHANNELS
 RATE = var.RATE
 
-RECORD_SECONDS = 2
-WAVE_OUTPUT_FILENAME = "AudioFiles/la_mineur.wav"
+RECORD_SECONDS = 10
+WAVE_OUTPUT_FILENAME = "AudioFiles/re.wav"
 
 p = pyaudio.PyAudio()
 

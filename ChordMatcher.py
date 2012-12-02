@@ -32,38 +32,45 @@ class ChordMatcher():
         data = stream.read(var.CHUNK)
 
         i = 0
-        successive_match = 0
         last_match = -1
         challenger = -1
-
+        successive_challenge = 0
         while(True):
-            data = stream.read(var.CHUNK)
+            try: 
+                  data = stream.read(var.CHUNK) 
+            except IOError: 
+                  pass 
+
             i += 1
-            if i%5 == 0 :
+            if i%2 == 0 :
                 data_fft = da.normalize(da.getFft(data, var.RATE))
                 best_match, distance_to_best_match = self.match(data_fft)
-                if last_match != -1 :
-                    distance_to_last_match = da.distance(data_fft, last_match.chord_fft)
+                if last_match == -1 :
+                    last_match = best_match
+                    print "I got " + best_match.name + " with an error of " + str(distance_to_best_match)
                 else :
-                    distance_to_last_match = 10
-
-                if best_match == last_match :
-                    if distance_to_best_match > best_match.threshold * 2 :
-                        print "I got nothing"
-                        last_match = -1                
-                else :
-                    if distance_to_best_match < distance_to_last_match * 0.9 :
-                        if distance_to_best_match < best_match.threshold * 1.2 :
-                            if successive_match > 1 :
+                    if last_match != best_match :
+                        # distance_to_last_match = da.distance(data_fft, last_match.chord_fft)
+                        if best_match == challenger or challenger == -1 :
+                            successive_challenge += 1
+                            if successive_challenge > 3 :
                                 print "I got " + best_match.name + " with an error of " + str(distance_to_best_match)
-                                last_match = best_match 
+                                last_match = best_match
+                                challenger = -1
+                                successive_challenge = 0
                             else :
-                                if best_match == challenger :
-                                    successive_match += 1
-                                else :
-                                    print "Challenger Beaten by " + best_match.name
-                                    challenger = best_match
-                                    successive_match = 0
+                                # print "o"
+                                pass
+                        else :
+                            # print "x"
+                            challenger = best_match 
+                            successive_challenge = 0
+                    else :
+                        # print "."
+                        challenger = -1
+                        successive_challenge = 0
+
+
 
         print("* done recording")
 

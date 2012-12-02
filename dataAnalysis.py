@@ -1,6 +1,7 @@
 import struct
 import numpy as np
 import variables as var
+import matplotlib.pyplot as mpp
 
 def normalize(dictionnary):
     '''Normalize a dict so that the norm is 1'''
@@ -35,7 +36,7 @@ def distance(dict_1, dict_2):
             print dict_1
             print dict_2
             distance += (dict_1[frequency] - dict_2[frequency]) ** 2
-            
+
     return np.sqrt(distance)
 
 def average_dictionary(dictionaries):

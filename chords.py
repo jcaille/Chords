@@ -14,13 +14,14 @@ def learn_from_audio_files() :
     snippets = []
     for wave_file in files_to_learn :
         name = wave_file[0:-4]
-        real_file = var.audio_files_folder + wave_file
-        snippet = rs.ReferenceSnippet(name)
-        snippet.learn_from_wave_file(real_file)
+        if not os.path.isfile(var.reference_folder+name+".crd"):
+            real_file = var.audio_files_folder + wave_file
+            snippet = rs.ReferenceSnippet(name)
+            snippet.learn_from_wave_file(real_file)
 
-        pickle_file = var.reference_folder + name +".crd"
-        snippet.save_to_file(pickle_file)
-        snippets.append(snippet)
+            pickle_file = var.reference_folder + name +".crd"
+            snippet.save_to_file(pickle_file)
+            snippets.append(snippet)
 
     return snippets
 
@@ -43,5 +44,5 @@ def live_recognition() :
     matcher = cm.ChordMatcher(chords)
     matcher.listen()
 
-# learn_from_audio_files()
+learn_from_audio_files()
 live_recognition()
