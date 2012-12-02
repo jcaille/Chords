@@ -2,13 +2,15 @@
 
 import pyaudio
 import wave
+import variables as var
 
-CHUNK = 2048
+CHUNK = var.CHUNK
 FORMAT = pyaudio.paInt16
-CHANNELS = 2
-RATE = 44100
+CHANNELS = var.CHANNELS
+RATE = var.RATE
+
 RECORD_SECONDS = 2
-WAVE_OUTPUT_FILENAME = "learn.wav"
+WAVE_OUTPUT_FILENAME = "AudioFiles/la_mineur.wav"
 
 p = pyaudio.PyAudio()
 
